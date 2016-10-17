@@ -1,1 +1,4 @@
+<<<<<<< HEAD
 the erercise for lab3 3
+=======
+
