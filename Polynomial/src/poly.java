@@ -1,111 +1,148 @@
+package ll;
 
 import java.util.regex.*;
-
+//import poly.java;
+/**
+ * 
+ * @author sion
+ *
+ */
+//Each class should declare at least one constructor
+//å¯¤è™¹ç›æ¶“ï¿½æ¶“î…ç€¯é–«çŠ²æ«’é’æ¿†îé–æ §å½‰é–²ï¿½
 class Polynomial {
-    private String polynomial;
-    public Boolean expression(String s)
+    private String poly;
+    // It is somewhat confusing to have a field name matching the declaring class name
+    //publicMethodCommentRequirement  Required
+    public Boolean expression(String parameter)
+    //Avoid variables with short names like s
+    //Avoid reassigning parameters such as ''
+    //Reassigning values to parameters is a questionable practice. Use a temporary local variable instead.
     {
-    	if (check(arrytostring(s)) == true) {
-    		this.polynomial = arrytostring(s);
-    		System.out.println(s);
-    		s=polynomial;
+    	final String temp = parameter;//å¨£è¯²å§æ¶“å­˜æ¤‚é™æ©€å™º
+    	if (check(arrytostring(parameter))) {
+    		this.poly = arrytostring(parameter);
+    		System.out.println(parameter);
+    		parameter = poly;
     		return true;
     	}
-    	//Èç¹ûpolynomialÖĞ»¹Ã»ÓĞ¶àÏîÊ½£¬Ö±½Ó·µ»Ø£¬²»·ÖÎöÃüÁî¡£
-    	if (this.polynomial == null) return true;
-    	
-    	//¼ì²âÊÇ·ñÎª¼ò»¯ÃüÁî
-    	if (s.matches("!simplify [a-zA-Z]+=\\d+")){
+    	//æ¿¡å‚›ç‰polyæ¶“î…¡ç¹•å¨Œâ„ƒæ¹æ¾¶æ°¶ã€å¯®å¿¥ç´é©å­˜å¸´æ©æ–¿æ´–é”›å±¼ç¬‰é’å—˜ç€½é›æˆ’æŠ¤éŠ†ï¿½
+    	if (this.poly == null) {return true;}
+    	//A method should have only one exit point, and that should be the last statement in the method
+    	//å¦«ï¿½å¨´å¬«æ§¸éšï¸¿è´Ÿç» ï¿½é–æ §æ‡¡æµ ï¿½
+    	if (parameter.matches("!simplify [a-zA-Z]+=\\d+")){
     		
-    		this.simplify(s);
+    		this.simplify(parameter);
     	}
-    	if (s.matches("!simplify")) {
+    	if (parameter.matches("!simplify")) {
     		this.simplify();
     		}
-    	//¼ì²âÊÇ·ñÎªÇóµ¼ÃüÁî
-    	if (s.matches("!d/d[a-zA-Z]+")) {
-    		Pattern var = Pattern.compile("!d/d([a-zA-Z]+)");
-    		Matcher matcherVar = var.matcher(s);
+    	//å¦«ï¿½å¨´å¬«æ§¸éšï¸¿è´Ÿå§¹å‚šî‡±é›æˆ’æŠ¤
+    	if (parameter.matches("!d/d[a-zA-Z]+")) {
+    		final Pattern var = Pattern.compile("!d/d([a-zA-Z]+)");//final
+    		final Matcher matcherVar = var.matcher(parameter);
     		matcherVar.find();
     		derivation(matcherVar.group(1));
     	}
     	
     	return true;
     }
-    private String arrytostring(String s)//@Ö§³ÖÆ¥Åä^À´±íÊ¾aµÄ¶àÉÙ´Î·½
+    @SuppressWarnings("null")
+	private String arrytostring(final String pa2)//@é€îˆ›å¯”é–å½’å¤^é‰ãƒ¨ã€ƒç»€ç¯´é¨å‹«î˜¿çæˆî‚¼é‚ï¿½
     {
-    	Pattern polyPattern2 = Pattern.compile("([a-zA-Z]+)\\^([0-9])");
-    	Matcher poly2 = polyPattern2.matcher(s);
-    	int count=0;
-    	String varcount=new String();
-    	if(poly2.find())
+    	String temp=pa2;
+    	final Pattern polyPattern2 = Pattern.compile("([a-zA-Z]+)\\^([0-9])");
+    	final Matcher poly2 = polyPattern2.matcher(pa2);
+    	int count ;
+    	//Found 'DD'-anomaly for variable 'count'
+    	//DD and DU anomalies (if I remember correctlyéˆ¥æ“¨ use FindBugs and the messages are a little different)
+    	//refer to assigning a value to a local variable that is never read, 
+    	//usually because it is reassigned another value before ever being read.
+    	//A typical case would be initializing some variable with null when it is declared. 
+    	//Don't declare the variable until it's needed.
+    	StringBuffer varcount =null ;
+    	if (poly2.find())
     	{
     		count=Integer.parseInt(poly2.group(2));
     		//System.out.println("group0"+poly2.group(0)+"group1"+poly2.group(1)+"group2"+poly2.group(2));
     		for(int i=0;i<count-1;i++)
     		{
-    			varcount=varcount+poly2.group(1)+"*";
+    			varcount.append(poly2.group(1) + "*");
     		}
-    		varcount+=poly2.group(1);
-    		s=s.replace(poly2.group(0),varcount);
-    		//System.out.println("Ìæ»»ºó£º"+s);
+    		varcount.append(poly2.group(1));//Prefer StringBuffer over += for concatenating strings
+    		 temp=pa2.replace(poly2.group(0),varcount);
+    		//System.out.println("é‡æŒå´²éšåº¯ç´°"+s);
     	}
-    	return s;
+    	return  temp;
     }
     
-    private Boolean check(String s)
+    /**
+     * 
+     * for warning
+     *
+     */
+    private Boolean check(final String temp)
     {
-    	Pattern polyPattern = Pattern.compile("(([0-9]+|[a-zA-Z]+)(\\*|\\+))*([0-9]+|[a-zA-Z]+)");//@
-    	Matcher poly = polyPattern.matcher(s);
+    	final Pattern polyPattern = Pattern.compile("(([0-9]+|[a-zA-Z]+)(\\*|\\+))*([0-9]+|[a-zA-Z]+)"); //@
+    	final Matcher poly = polyPattern.matcher(temp);
     	return poly.matches();
     	
     }
     
-
-    public boolean simplify()//ÖØÔØ£¬Ã»ÓĞÊäÈë±äÁ¿Öµ
+    /**
+     * 
+     * for warning
+     *
+     */
+    public boolean simplify()//é–²å¶ˆæµ‡é”›å±¾ç—…éˆå¤ç·­éãƒ¥å½‰é–²å¿“ï¿½ï¿½
     {
-    	System.out.println(this.polynomial);
+    	System.out.println(this.poly);
     	return true;
     }
-    
-    public boolean simplify(String s)
+    /**
+     * 
+     * Potential violation of Law of Demeter (method chain calls)?
+	- Potential violation of Law of Demeter (object not created 
+	 locally)?
+     *
+     */
+    public boolean simplify(final String var)
     {
-		//»ñÈ¡variableºÍÊı×Ö
-    	Pattern simp = Pattern.compile("!simplify ([a-zA-Z]+)=(\\d+)");
-    	Matcher matchesimp = simp.matcher(s);
+		//é‘¾å³°å½‡variableéœå±¾æšŸç€›ï¿½
+    	final Pattern simp = Pattern.compile("!simplify ([a-zA-Z]+)=(\\d+)");
+    	final Matcher matchesimp = simp.matcher(var);
     	matchesimp.find();
-		String variable = matchesimp.group(1);
-		String value = matchesimp.group(2);
+		final String variable = matchesimp.group(1);
+		final String value = matchesimp.group(2);
 		
-		//½«polynomialÖĞµÄ¸Ãvariable,Ìæ»»³Évalue
-		Pattern varPattern = Pattern.compile(variable);
-		Matcher findvar = varPattern.matcher(this.polynomial);
+		//çå”’olynomialæ¶“î… æ®‘ç’‡î™¼ariable,é‡æŒå´²é´æ¦alue
+		final Pattern varPattern = Pattern.compile(variable);
+		final Matcher findvar = varPattern.matcher(this.poly);
 		if (findvar.find()) {
-			//Èô²éÕÒµ½¸Ã×Ö·û£¬½øĞĞÌæ»»£¬·ñÔò´òÓ¡´íÎóĞÅÏ¢
-			String newStr = new String();
-			newStr = this.polynomial.replace(variable, value);
+			//é‘»ãƒ¦ç…¡éµæƒ§åŸŒç’‡ãƒ¥ç“§ç»—ï¸¼ç´æ©æ¶œî”‘é‡æŒå´²é”›å±½æƒé’æ¬å¢¦é—ä¼´æ•Šç’‡îˆ™ä¿Šé­ï¿½
+			String newStr ;
+			newStr = this.poly.replace(variable, value);
     		
-			//ÅĞ¶ÏnewStrÖĞÊÇ·ñ»¹ÓĞ×ÖÄ¸
-			Pattern letter = Pattern.compile("[a-zA-Z]+");
-			Matcher haveLetter = letter.matcher(newStr);
+			//é’ã‚†æŸ‡newStræ¶“î…Ÿæ§¸éšï¹ç¹•éˆå¤Šç“§å§£ï¿½
+			final Pattern letter = Pattern.compile("[a-zA-Z]+");
+			final Matcher haveLetter = letter.matcher(newStr);
 			
-		Pattern somel = Pattern.compile("((\\d\\*)+[a-zA-Z]+)|([a-zA-Z]+(\\*\\d)+)");
-		Matcher matchersomel = somel.matcher(newStr);//Æ¥Åä²¿·ÖËãÊ½ºÍ×ÖÄ¸ÏàÁ¬
+		final Pattern somel = Pattern.compile("((\\d\\*)+[a-zA-Z]+)|([a-zA-Z]+(\\*\\d)+)");
+		final Matcher matchersomel = somel.matcher(newStr); //é–å½’å¤é–®ã„¥åç» æ¥€ç´¡éœå±½ç“§å§£å¶‡æµ‰æ©ï¿½
 		
-		Pattern some2 = Pattern.compile("(\\d\\*)+(\\d)\\+");
-		Matcher matchersomel2 = some2.matcher(newStr);//Æ¥Åä²¿·ÖËãÊ½ºÍ×ÖÄ¸ÏàÁ¬
+		final Pattern some2 = Pattern.compile("(\\d\\*)+(\\d)\\+");
+		Matcher matchersomel2 = some2.matcher(newStr); //é–å½’å¤é–®ã„¥åç» æ¥€ç´¡éœå±½ç“§å§£å¶‡æµ‰æ©ï¿½
 			if (haveLetter.find()) {
-				//Èç¹ûĞÂµÄ×Ö·û´®ÖĞ»¹ÓĞ×ÖÄ¸´òÓ¡£¬·ñÔò¼ÆËãËãÊ½µÄÖµ
+				//æ¿¡å‚›ç‰é‚æ‰®æ®‘ç€›æ¥ƒîƒæ¶“è¹­è…‘æ©æ¨»æ¹ç€›æ¥ç˜éµæ’³åµƒé”›å±½æƒé’æ¬’î…¸ç» æ¥ƒç•»å¯®å¿•æ®‘éŠï¿½
 				
-				if(matchersomel2.find())
+				if (matchersomel2.find())
 				{
 					multisome(newStr);
 				}
-				else if(matchersomel.find())//Èç¹û²¿·ÖËãÊ½ºÍ×ÖÄ¸ÏàÁ¬
+				else if (matchersomel.find())//æ¿¡å‚›ç‰é–®ã„¥åç» æ¥€ç´¡éœå±½ç“§å§£å¶‡æµ‰æ©ï¿½
 				{
 					calculatesome(newStr);
 				}
-				else System.out.println(newStr);
+				else {System.out.println(newStr);}
 //				
 			} else {
 				System.out.println(calculate(newStr));
@@ -116,123 +153,121 @@ class Polynomial {
 			return false;
 		}
     }
-    private void multisome(String equation)//Èç¹û¶àÏîÊ½Àï²¿·ÖËãÊ½ºÍ¼ÓºÅÏàÁ¬
-    {
-    	Pattern item3 = Pattern.compile("(\\d\\*)+(\\d)\\+");
-		Matcher matcherItem3 = item3.matcher(equation);
-		String newStr3 = new String();
-    	newStr3 = equation;
+    private void multisome(final String equation) { //æ¿¡å‚›ç‰æ¾¶æ°¶ã€å¯®å¿›å™·é–®ã„¥åç» æ¥€ç´¡éœå±½å§é™é£æµ‰æ©ï¿½
+    	final Pattern item3 = Pattern.compile("(\\d\\*)+(\\d)\\+");
+		final Matcher matcherItem3 = item3.matcher(equation);
+		String newStr3 ;
+		newStr3 = equation;
     	while (matcherItem3.find()) {
     		int item3Value = 1;
-    		Pattern num3 = Pattern.compile("\\d");
-    		Matcher matcherNum3 = num3.matcher(matcherItem3.group(0));
+    		final Pattern num3 = Pattern.compile("\\d");
+    		final Matcher matcherNum3 = num3.matcher(matcherItem3.group(0));
     		//System.out.println("group(0)="+matcherItem3.group(0)+"group(1)="+matcherItem3.group(1)+"groupcount="+matcherItem3.groupCount());
     		while (matcherNum3.find()) {
-    			item3Value *= Integer.parseInt(matcherNum3.group(0));//½«×Ö·û´®½âÎöÎªÕûÊı
+    			item3Value *= Integer.parseInt(matcherNum3.group(0)); //çå——ç“§ç»—ï¸¿è¦†ç‘™ï½†ç€½æ¶“çƒ˜æš£éï¿½
     		}
     		//System.out.println("matcherItem3.group(2)"+matcherItem3.group(2));
     		//item3Value=item3Value*Integer.parseInt(matcherItem3.group(2));
-			newStr3=newStr3.replace(matcherItem3.group(0),item3Value+"+");
+			newStr3 = newStr3.replace(matcherItem3.group(0), item3Value + "+");
     	}
 			System.out.println(newStr3);
     		
     }
-    private void calculatesome(String equation)//Èç¹û¶àÏîÊ½Àï²¿·ÖËãÊ½ºÍ×ÖÄ¸ÏàÁ¬
-    {
-    	Pattern item2 = Pattern.compile("(\\d\\*)*[a-zA-Z]+|([a-zA-Z]+(\\*\\d)*)");
-    	Matcher matcherItem2 = item2.matcher(equation);
-    	String newStr2 = new String();
-    	String vartemp=new String();
-    	newStr2 = equation;
+    private void calculatesome(final String equation) {//æ¿¡å‚›ç‰æ¾¶æ°¶ã€å¯®å¿›å™·é–®ã„¥åç» æ¥€ç´¡éœå±½ç“§å§£å¶‡æµ‰æ©ï¿½ 
+    	final Pattern item2 = Pattern.compile("(\\d\\*)*[a-zA-Z]+|([a-zA-Z]+(\\*\\d)*)");
+    	final Matcher matcherItem2 = item2.matcher(equation);
+    	String newStr2 = equation;
+    	String vartemp = "";
+    	//2.DU-å¯®å‚šçˆ¶é”›æ°«ç«´æ¶“î„å°é’æ°¬ç•¾æ¶”å¤Œæ®‘é™æ©€å™ºé„îˆ›æ¹­ç€¹æ°«ç®Ÿé¨å‹©ï¿½å‚ç¹–æµœæ¶˜ç´“ç”¯ç¨¿å½²é‘³è—‰åš­éœæ¿æ¹ªé…î‡€ï¿½æ°±æ®‘å©§æ„ªå”¬é®ä½¹æƒéˆîƒ¿è…‘3.DD-å¯®å‚šçˆ¶é”›æ°«ç«´æ¶“î„å°é’æ°¬ç•¾æ¶”å¤Œæ®‘é™æ©€å™ºé–²å¶†æŸŠç€¹æ°«ç®ŸéŠ†å‚ç¹–é„îˆ™ç¬‰æ¿‚ç•Œæ®‘æµ£å——è‹Ÿé—ˆç‚°ç«´ç€¹æ°­æ§¸æ¶“çŒ™ugéŠ†ï¿½
     	while (matcherItem2.find()) {
     		int item2Value = 1;
-    		Pattern num = Pattern.compile("\\d");
-    		Matcher matcherNum = num.matcher(matcherItem2.group(0));
+    		final Pattern num = Pattern.compile("\\d");
+    		final Matcher matcherNum = num.matcher(matcherItem2.group(0));
     		
-    		//System.out.println("group(0)="+matcherItem2.group(0)+"group(1)="+matcherItem2.group(1)+"groupcount="+matcherItem2.groupCount());
     		
-    		Pattern var = Pattern.compile("([a-zA-Z]+)");
-    		Matcher matchervar = var.matcher(matcherItem2.group(0));
-    		if(matchervar.find());
-    		vartemp=matchervar.group(0);
     		
+    		final Pattern var = Pattern.compile("([a-zA-Z]+)");
+    		final Matcher matchervar = var.matcher(matcherItem2.group(0));
+    		if (matchervar.find()) {
+    			vartemp = matchervar.group(0); 
+    			} 
     		
     		while (matcherNum.find()) {
-    			item2Value *= Integer.parseInt(matcherNum.group(0));//½«×Ö·û´®½âÎöÎªÕûÊı
+    			item2Value *= Integer.parseInt(matcherNum.group(0));//çå——ç“§ç»—ï¸¿è¦†ç‘™ï½†ç€½æ¶“çƒ˜æš£éï¿½
     		}
     		
-			newStr2=newStr2.replace(matcherItem2.group(0),item2Value+"*"+vartemp);
+			newStr2 = newStr2.replace(matcherItem2.group(0), item2Value + "*" + vartemp);
     	}
 			System.out.println(newStr2);
     		
     }
-    private int calculate(String equation)//Èç¹û¶àÏîÊ½¶¼¿ÉÒÔ¼ò»¯ÎªÊı×ÖÊ±
+    private int calculate(final String equation)//æ¿¡å‚›ç‰æ¾¶æ°¶ã€å¯®å¿›å…˜é™îˆ™äº’ç» ï¿½é–æ ¦è´Ÿéæ¿ç“§éƒï¿½
     {
-    	Pattern item = Pattern.compile("(\\d\\*)*\\d");
-    	Matcher matcherItem = item.matcher(equation);
+    	final Pattern item = Pattern.compile("(\\d\\*)*\\d");
+    	final Matcher matcherItem = item.matcher(equation);
     	int sum = 0;
     	while (matcherItem.find()) {
     		int itemValue = 1;
-    		Pattern num = Pattern.compile("\\d");
-    		Matcher matcherNum = num.matcher(matcherItem.group(0));
+    		final Pattern num = Pattern.compile("\\d");
+    		final Matcher matcherNum = num.matcher(matcherItem.group(0));
     		while (matcherNum.find()) {
-    			itemValue *= Integer.parseInt(matcherNum.group(0));//½«×Ö·û´®½âÎöÎªÕûÊı
+    			itemValue *= Integer.parseInt(matcherNum.group(0)); //çå——ç“§ç»—ï¸¿è¦†ç‘™ï½†ç€½æ¶“çƒ˜æš£éï¿½
     		}
     		sum += itemValue;
     	}
     	return sum;
     }
     
-    public void derivation(String variable)
+    public void derivation(final String variable)
     {
-    	Pattern judge = Pattern.compile(variable);
-    	Matcher matcherjudge= judge.matcher(polynomial);
-    	if(!matcherjudge.find())
+    	final Pattern judge = Pattern.compile(variable);
+    	final Matcher matcherjudge = judge.matcher(poly);
+    	//Avoid if (x != y) ..; else ..;
+    	if (matcherjudge.find())
     	{
-    		System.out.println("Error, no variable");
+//        	Pattern item = Pattern.compile("(.*)\\+");
+//        	Matcher matcherItem = item.matcher(polynomial);
+        	String newStr = "";//               avoid     = new String();
+        	final String[]app = poly.split("\\+");    //a->app
+        	int j=0;
+        	while (j < app.length) {
+        		final Pattern var = Pattern.compile(variable);
+        		final String oldItem = app[j];
+        		//System.out.println("matchreItem group(1)"+matcherItem.group(1));
+        		final Matcher matcherVar = var.matcher(oldItem);
+        		//System.out.println("group(0)"+matcherVar.group(0));
+        		int counter = 0; //ç¼ç†»î…¸ç’‡ãƒ¥å½‰é–²å¿“åš­éœæ‰®æ®‘å¨†â„ƒæšŸ
+        		String newItem;
+        		String replace;
+        		while (matcherVar.find()) { 
+        			++counter; 
+        			} //é‹å‹«ç¼“é‚æ‰®æ®‘item
+        		if (counter == 0) {
+        			newItem = "";
+        		}
+        		else if (counter == 1) {
+        			newItem = oldItem.replaceFirst("\\*" + variable, ""); 
+        		}
+        		else {
+        			replace = oldItem.replaceFirst("\\*" + variable, "");
+        			newItem =  counter + "*" + replace;
+        		}
+        		
+        		if (counter == 0) {
+        			newStr = newStr + newItem; //   
+        		}
+        		else {
+        			newStr += newItem + "+";
+        			}
+        		j++;
+        	}
+        	newStr = newStr.substring(0, newStr.length() - 1);
+        	calculatesome(newStr);
+    		
     	}
     	else
     	{
-//    	Pattern item = Pattern.compile("(.*)\\+");
-//    	Matcher matcherItem = item.matcher(polynomial);
-    	String newStr = new String();
-    	String[]a=polynomial.split("\\+");
-    	int j=0;
-    	while (j<a.length) {
-    		Pattern var = Pattern.compile(variable);
-    		String oldItem =a[j];
-    		//System.out.println("matchreItem group(1)"+matcherItem.group(1));
-    		Matcher matcherVar = var.matcher(oldItem);
-    		//System.out.println("group(0)"+matcherVar.group(0));
-    		int i = 0; //Í³¼Æ¸Ã±äÁ¿³öÏÖµÄ´ÎÊı
-    		String newItem;
-    		String replace ;
-    		while (matcherVar.find()) ++i;
-    		//¹¹½¨ĞÂµÄitem
-    		if(i==0)
-    		{
-    			newItem="";
-    		}
-    		else if(i==1)
-    		{
-    			newItem=oldItem.replaceFirst("\\*"+variable,"");
-    		}
-    		else {
-    			replace = oldItem.replaceFirst("\\*"+variable, "");
-    			newItem =  i + "*" + replace;
-    		}
-    		
-    		if(i==0)
-    		{
-    			newStr+=newItem;
-    		}
-    		else newStr += newItem + "+";
-    		j++;
-    	}
-    	newStr = newStr.substring(0, newStr.length() - 1);
-    	calculatesome(newStr);
+    		System.out.println("Error, no variable");
     	}
     }
-    
 }
-//hello this is change for lab3
